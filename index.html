@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#4a5c2f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Dieta" />
+  <title>Calculador de Dieta 80/20</title>
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  APPLE TOUCH ICON — Data URI SVG                            ║
+    ║  Círculo verde oliva (#556B2F) com folha orgânica + texto  ║
+    ║  Distinto do app de checklists para não misturar ícones     ║
+    ╚══════════════════════════════════════════════════════════════╝
+  -->
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3CradialGradient id='bg' cx='40%25' cy='35%25' r='65%25'%3E%3Cstop offset='0%25' stop-color='%23728c3f'/%3E%3Cstop offset='100%25' stop-color='%23394a1e'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='38' fill='url(%23bg)'/%3E%3C!-- Folha principal --%3E%3Cpath d='M90 32 C90 32 130 55 128 95 C126 128 100 148 90 148 C80 148 54 128 52 95 C50 55 90 32 90 32 Z' fill='%23c8e8a0' opacity='0.92'/%3E%3C!-- Nervura central --%3E%3Cpath d='M90 42 C90 42 90 100 90 145' fill='none' stroke='%23556B2F' stroke-width='3.5' stroke-linecap='round'/%3E%3C!-- Nervuras laterais --%3E%3Cpath d='M90 72 C75 68 62 74 58 82' fill='none' stroke='%23556B2F' stroke-width='2' stroke-linecap='round' opacity='0.7'/%3E%3Cpath d='M90 88 C105 84 118 90 122 98' fill='none' stroke='%23556B2F' stroke-width='2' stroke-linecap='round' opacity='0.7'/%3E%3Cpath d='M90 104 C76 100 63 106 59 114' fill='none' stroke='%23556B2F' stroke-width='2' stroke-linecap='round' opacity='0.7'/%3E%3C!-- Caule --%3E%3Cpath d='M90 145 C90 145 84 158 80 162' fill='none' stroke='%23c8b89a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!-- Favicon padrão (browsers desktop) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23556B2F'/%3E%3Cpath d='M16 4 C16 4 26 10 25.6 19 C25.2 27 18 31 16 31 C14 31 6.8 27 6.4 19 C6 10 16 4 16 4 Z' fill='%23c8e8a0'/%3E%3Cpath d='M16 6 L16 30' fill='none' stroke='%23556B2F' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  PWA MANIFEST — injetado via JavaScript                     ║
+    ║  • id: "app-dieta-8020"  → evita confusão com outros apps  ║
+    ║  • name / short_name atualizados                            ║
+    ║  • display: standalone → sem barra de endereços             ║
+    ╚══════════════════════════════════════════════════════════════╝
+  -->
+  <script>
+    (function () {
+      // Mesmo SVG da folha usado no apple-touch-icon
+      const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+        <defs>
+          <radialGradient id="bg" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#728c3f"/>
+            <stop offset="100%" stop-color="#394a1e"/>
+          </radialGradient>
+        </defs>
+        <rect width="180" height="180" rx="38" fill="url(#bg)"/>
+        <path d="M90 32 C90 32 130 55 128 95 C126 128 100 148 90 148 C80 148 54 128 52 95 C50 55 90 32 90 32 Z" fill="#c8e8a0" opacity="0.92"/>
+        <path d="M90 42 C90 42 90 100 90 145" fill="none" stroke="#556B2F" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M90 72 C75 68 62 74 58 82" fill="none" stroke="#556B2F" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+        <path d="M90 88 C105 84 118 90 122 98" fill="none" stroke="#556B2F" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+        <path d="M90 104 C76 100 63 106 59 114" fill="none" stroke="#556B2F" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+        <path d="M90 145 C90 145 84 158 80 162" fill="none" stroke="#c8b89a" stroke-width="4" stroke-linecap="round"/>
+      </svg>`;
+
+      const iconDataUri = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(ICON_SVG)));
+
+      const manifest = {
+        id: "app-dieta-8020",                               // ← ID único: evita conflito com outros PWAs
+        name: "Dieta 80/20",                               // ← Nome completo atualizado
+        short_name: "Dieta",                               // ← Nome curto na tela inicial
+        description: "Calculador semanal de compras para a dieta 80/20",
+        start_url: ".",
+        display: "standalone",                             // ← Sem barra de endereços
+        background_color: "#f5f0e8",
+        theme_color: "#556B2F",
+        orientation: "portrait",
+        icons: [
+          { src: iconDataUri, sizes: "180x180", type: "image/svg+xml", purpose: "any maskable" },
+          { src: iconDataUri, sizes: "192x192", type: "image/svg+xml" },
+          { src: iconDataUri, sizes: "512x512", type: "image/svg+xml" }
+        ]
+      };
+
+      const blob = new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" });
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement("link");
+      link.rel   = "manifest";
+      link.href  = url;
+      document.head.appendChild(link);
+    })();
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #f5f0e8; }
+    body { -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+    #root { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React + Babel via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
+
+    /* ─── PERSISTÊNCIA — chave exclusiva deste app ──────────── */
+    const LS_KEY = "dados_dieta_8020"; // nunca colide com outros apps
+
+    function loadFromStorage(fallback) {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch { return fallback; }
+    }
+
+    function saveToStorage(data) {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch {}
+    }
+
+    /* ─── DATA ─────────────────────────────────────────────── */
+    const MEALS = [
+      {
+        id: "cafe", label: "☀️ Café da Manhã",
+        options: [
+          { label: "Op1 – Tapioca",      items: { tapioca:30, ovo:50, requeijao:20, mussarela:20 } },
+          { label: "Op2 – Pão Integral", items: { pao_integral:50, chia:8, frango:60, requeijao:20 } },
+          { label: "Op3 – Frango+Milho", items: { frango:70, milho:5, requeijao:20, mussarela:15 } },
+          { label: "Op4 – Cuscuz",       items: { cuscuz:30, frango:60, mussarela:20, requeijao:20 } },
+        ],
+      },
+      {
+        id: "lanche_manha", label: "🍓 Lanche da Manhã",
+        options: [
+          { label: "Op1 – Whey+Iogurte",    items: { whey:30, morango:100, iogurte:120 } },
+          { label: "Op2 – Bebida Proteica",  items: { bebida_proteica:1 } },
+        ],
+      },
+      {
+        id: "almoco", label: "🍽️ Almoço",
+        options: [
+          { label: "Op1 – Arroz+Frango",    items: { arroz:50, frango:150, tangerina:100 } },
+          { label: "Op2 – Macarrão+Carne",  items: { macarrao:60, molho_tomate:50, carne_bovina:100 } },
+        ],
+      },
+      {
+        id: "lanche_tarde", label: "🌿 Lanche da Tarde",
+        options: [
+          { label: "Op1 – Frango+Milho",    items: { frango:70, milho:5, requeijao:20, mussarela:15 } },
+          { label: "Op2 – Banana+Granola",  items: { banana:100, granola:20, aveia:20, whey:15, iogurte:100 } },
+        ],
+      },
+      {
+        id: "lanche_noite", label: "🏋️ Lanche Noite (Treino)",
+        options: [
+          { label: "Op1 – Banana+Whey",   items: { banana:100, whey:15 } },
+          { label: "Op2 – Rap10+Frango",  items: { rap10:60, frango:20, requeijao:10 } },
+        ],
+      },
+      {
+        id: "jantar", label: "🌙 Jantar",
+        options: [
+          { label: "Op1 – Batata+Carne Moída", items: { batata_inglesa:120, carne_moida:80 } },
+          { label: "Op2 – Arroz+Peixe",        items: { arroz:50, peixe:120 } },
+          { label: "Op3 – Frango Empanado",    items: { frango:90, requeijao:20, farinha_rosca:10, ovo:50 } },
+          { label: "Op4 (OFF) – Hambúrguer",   items: { pao_bola:50, hamburguer:70, mussarela:20, requeijao:20 } },
+        ],
+      },
+    ];
+
+    const LABELS = {
+      frango:"Frango", arroz:"Arroz", ovo:"Ovo", requeijao:"Requeijão",
+      mussarela:"Muçarela", tapioca:"Tapioca", chia:"Chia",
+      pao_integral:"Pão Integral", cuscuz:"Cuscuz", milho:"Milho",
+      whey:"Whey", morango:"Morango", iogurte:"Iogurte",
+      bebida_proteica:"Bebida Proteica (un)", tangerina:"Tangerina",
+      macarrao:"Macarrão", molho_tomate:"Molho de Tomate",
+      carne_bovina:"Carne Bovina", banana:"Banana", granola:"Granola",
+      aveia:"Aveia", rap10:"Rap10", batata_inglesa:"Batata Inglesa",
+      carne_moida:"Carne Moída", peixe:"Peixe",
+      farinha_rosca:"Farinha de Rosca", pao_bola:"Pão Bola",
+      hamburguer:"Hambúrguer",
+    };
+    const UNIT_ITEMS = ["bebida_proteica"];
+
+    function initDays() {
+      const s = {};
+      MEALS.forEach(m => {
+        s[m.id] = {};
+        m.options.forEach((_, i) => { s[m.id][i] = i === 0 ? 7 : 0; });
+      });
+      return s;
+    }
+
+    /* ─── APP ───────────────────────────────────────────────── */
+    function App() {
+      const [days, setDays] = useState(() => loadFromStorage(initDays()));
+      const [open, setOpen] = useState(null);
+
+      // Salva automaticamente sempre que "days" mudar
+      useEffect(() => { saveToStorage(days); }, [days]);
+
+      const totals = useMemo(() => {
+        const acc = {};
+        MEALS.forEach(m => {
+          m.options.forEach((opt, i) => {
+            const d = days[m.id][i] || 0;
+            if (!d) return;
+            Object.entries(opt.items).forEach(([k, g]) => {
+              acc[k] = (acc[k] || 0) + g * d;
+            });
+          });
+        });
+        return acc;
+      }, [days]);
+
+      function getTotal(mid) {
+        return Object.values(days[mid] || {}).reduce((a,b) => a+b, 0);
+      }
+
+      function adjust(mid, idx, delta) {
+        setDays(prev => {
+          const cur = prev[mid][idx] || 0;
+          const nv  = Math.max(0, cur + delta);
+          if (getTotal(mid) - cur + nv > 7) return prev;
+          return { ...prev, [mid]: { ...prev[mid], [idx]: nv } };
+        });
+      }
+
+      const fmt = (k, v) =>
+        UNIT_ITEMS.includes(k) ? `${v} un`
+        : v >= 1000 ? `${(v/1000).toFixed(2).replace(".",",")} kg`
+        : `${v} g`;
+
+      /* ── styles ── */
+      const S = {
+        root:      { fontFamily:"'Georgia','Times New Roman',serif", background:"#f5f0e8", minHeight:"100vh", color:"#3d3426" },
+        header:    { background:"#4a5c2f", padding:"env(safe-area-inset-top,20px) 20px 18px", position:"sticky", top:0, zIndex:10, boxShadow:"0 2px 14px rgba(0,0,0,.22)" },
+        hInner:    { display:"flex", alignItems:"center", gap:14, maxWidth:480, margin:"0 auto" },
+        badge:     { background:"#c8b89a", color:"#3d3426", fontWeight:900, fontSize:17, borderRadius:10, padding:"6px 12px", letterSpacing:1, flexShrink:0 },
+        h1:        { margin:0, fontSize:19, fontWeight:700, color:"#f5f0e8" },
+        hsub:      { margin:"2px 0 0", fontSize:11, color:"#b8c99a", fontStyle:"italic" },
+        content:   { maxWidth:480, margin:"0 auto", padding:"14px 13px 48px", display:"flex", flexDirection:"column", gap:10 },
+        card:      { background:"#fffcf5", borderRadius:14, overflow:"hidden", border:"1px solid #e0d8c8", boxShadow:"0 1px 6px rgba(0,0,0,.05)" },
+        chBtn:     { width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 16px", background:"none", border:"none", cursor:"pointer", textAlign:"left", gap:8 },
+        mLabel:    { fontSize:15, fontWeight:700, color:"#3d3426" },
+        hRight:    { display:"flex", alignItems:"center", gap:8, flexShrink:0 },
+        optList:   { borderTop:"1px solid #e8e0d0", paddingBottom:4 },
+        hint:      { fontSize:11, color:"#8a7c6a", textAlign:"center", padding:"4px 0 6px", fontStyle:"italic" },
+        optRow:    { display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 16px", gap:10, borderBottom:"1px solid #f0e8d8" },
+        oName:     { display:"block", fontSize:13, fontWeight:700, color:"#4a5c2f", marginBottom:2 },
+        oItems:    { display:"block", fontSize:11, color:"#8a7c6a", lineHeight:1.4, fontStyle:"italic" },
+        stepper:   { display:"flex", alignItems:"center", flexShrink:0, background:"#f0ebe0", borderRadius:22, overflow:"hidden", border:"1px solid #d8d0c0" },
+        sBtn:      { width:32, height:32, border:"none", background:"none", fontSize:18, cursor:"pointer", color:"#4a5c2f", fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", padding:0 },
+        sVal:      { fontSize:15, fontWeight:900, color:"#3d3426", minWidth:24, textAlign:"center" },
+        shopCard:  { background:"#4a5c2f", borderRadius:14, overflow:"hidden", marginTop:6, boxShadow:"0 4px 16px rgba(74,92,47,.22)" },
+        shopHdr:   { padding:"16px 18px 12px", borderBottom:"1px solid rgba(255,255,255,.12)", display:"flex", alignItems:"baseline", gap:10 },
+        shopTitle: { fontSize:17, fontWeight:700, color:"#f5f0e8" },
+        shopSub:   { fontSize:11, color:"#b8c99a", fontStyle:"italic" },
+        shopItem:  { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"9px 18px", borderBottom:"1px solid rgba(255,255,255,.07)" },
+        iName:     { fontSize:14, color:"#e8e0d0" },
+        iAmt:      { fontSize:14, fontWeight:900, color:"#c8d9a0", letterSpacing:.3 },
+        empty:     { padding:"16px 18px", color:"#b8c99a", fontSize:13, fontStyle:"italic" },
+      };
+
+      return (
+        <div style={S.root}>
+          {/* ── Header ── */}
+          <div style={S.header}>
+            <div style={S.hInner}>
+              <div style={S.badge}>80/20</div>
+              <div>
+                <h1 style={S.h1}>Calculador de Dieta</h1>
+                <p style={S.hsub}>Compras semanais em gramas</p>
+              </div>
+            </div>
+          </div>
+
+          <div style={S.content}>
+            {/* ── Meal cards ── */}
+            {MEALS.map(meal => {
+              const total = getTotal(meal.id);
+              const rem   = 7 - total;
+              const isOpen = open === meal.id;
+
+              return (
+                <div key={meal.id} style={S.card}>
+                  <button style={S.chBtn} onClick={() => setOpen(isOpen ? null : meal.id)}>
+                    <span style={S.mLabel}>{meal.label}</span>
+                    <div style={S.hRight}>
+                      <div style={{
+                        borderRadius:20, padding:"3px 10px", minWidth:42, textAlign:"center",
+                        background: rem===0 ? "#6b7c4a" : "#c8b89a", transition:"background .3s"
+                      }}>
+                        <span style={{ color: rem===0 ? "#f5f0e8":"#3d3426", fontWeight:700, fontSize:13 }}>
+                          {total}/7
+                        </span>
+                      </div>
+                      <span style={{ fontSize:18, color:"#6b7c4a", transition:"transform .2s", display:"inline-block",
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+                    </div>
+                  </button>
+
+                  {isOpen && (
+                    <div style={S.optList}>
+                      {rem > 0 && (
+                        <div style={S.hint}>{rem} dia{rem>1?"s":""} restante{rem>1?"s":""}</div>
+                      )}
+                      {meal.options.map((opt, i) => {
+                        const d = days[meal.id][i] || 0;
+                        return (
+                          <div key={i} style={{ ...S.optRow, opacity: d===0 && rem===0 ? .4 : 1, transition:"opacity .2s" }}>
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <span style={S.oName}>{opt.label}</span>
+                              <span style={S.oItems}>
+                                {Object.entries(opt.items)
+                                  .map(([k,v]) => `${v}${UNIT_ITEMS.includes(k)?"un":"g"} ${LABELS[k]||k}`)
+                                  .join(" · ")}
+                              </span>
+                            </div>
+                            <div style={S.stepper}>
+                              <button style={{ ...S.sBtn, opacity: d===0?.28:1 }}
+                                onClick={() => adjust(meal.id, i, -1)}>−</button>
+                              <span style={S.sVal}>{d}</span>
+                              <button style={{ ...S.sBtn, opacity: rem===0?.28:1 }}
+                                onClick={() => adjust(meal.id, i, +1)}>+</button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* ── Shopping list ── */}
+            <div style={S.shopCard}>
+              <div style={S.shopHdr}>
+                <span style={S.shopTitle}>🛒 Lista de Compras</span>
+                <span style={S.shopSub}>total semanal</span>
+              </div>
+              <div>
+                {Object.entries(totals).length === 0
+                  ? <p style={S.empty}>Ajuste os dias para gerar a lista.</p>
+                  : Object.entries(totals)
+                      .sort(([,a],[,b]) => b - a)
+                      .map(([k, v]) => (
+                        <div key={k} style={S.shopItem}>
+                          <span style={S.iName}>{LABELS[k] || k}</span>
+                          <span style={S.iAmt}>{fmt(k, v)}</span>
+                        </div>
+                      ))
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
